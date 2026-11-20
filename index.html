@@ -4,10 +4,281 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LinguaStream — Transkrip & Penerjemah Video Belajar</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-input: #0f172a;
+      --border-color: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-icon { font-size: 2rem; }
+    .brand h1 { font-size: 1.25rem; font-weight: 700; }
+    .subtitle { font-size: 0.8rem; color: var(--text-secondary); }
+    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+    .badge { padding: 0.3rem 0.7rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+    .badge-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+    .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+
+    .btn {
+      padding: 0.6rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+    .btn-secondary { background: #334155; color: var(--text-primary); }
+    .btn-secondary:hover:not(:disabled) { background: #475569; }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    .full-width { width: 100%; margin-top: 0.5rem; }
+
+    .container {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 1.5rem;
+      padding: 1.5rem 2rem;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    .panel { display: flex; flex-direction: column; gap: 1.5rem; }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+    .card h2 { font-size: 1rem; margin-bottom: 1rem; color: var(--text-primary); }
+
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .tab-btn {
+      flex: 1;
+      padding: 0.5rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .drop-zone {
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius);
+      padding: 2rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.08);
+    }
+
+    .hint { font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.35rem; }
+    .file-info {
+      margin-top: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .input-group { display: flex; gap: 0.5rem; }
+    input[type="text"], input[type="password"], select {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 0.875rem;
+    }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.75rem; }
+    .form-group label { font-size: 0.8rem; color: var(--text-secondary); }
+    .form-group small a { color: var(--accent); }
+
+    .player-wrapper { margin-top: 1rem; border-radius: 8px; overflow: hidden; background: #000; }
+    .media-element { width: 100%; max-height: 240px; display: block; }
+    .yt-frame iframe { width: 100%; height: 220px; border: none; }
+
+    .status-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: rgba(59, 130, 246, 0.12);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #93c5fd;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #93c5fd;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .transcript-card { display: flex; flex-direction: column; height: calc(100vh - 115px); }
+    .transcript-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+    .transcript-tools { display: flex; gap: 0.5rem; }
+
+    .view-modes {
+      display: flex;
+      gap: 0.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .mode-btn {
+      padding: 0.4rem 0.8rem;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .mode-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+    .transcript-list {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .segment-item {
+      padding: 0.85rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .segment-item:hover { border-color: var(--accent); }
+
+    .timestamp {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(59, 130, 246, 0.15);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      margin-bottom: 0.4rem;
+    }
+
+    .text-original { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.35rem; }
+    .text-translated { font-size: 0.95rem; color: var(--text-primary); font-weight: 500; }
+
+    .transcript-list.mode-translated .text-original { display: none; }
+    .transcript-list.mode-original .text-translated { display: none; }
+
+    .summary-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      background: var(--bg-input);
+      border-radius: 8px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .empty-state { text-align: center; margin: auto; color: var(--text-secondary); }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 460px;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+    .close-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; padding: 1rem; }
+      .transcript-card { height: auto; min-height: 450px; }
+    }
+  </style>
 </head>
 <body>
-  <!-- Header Navigasi -->
   <header class="navbar">
     <div class="brand">
       <span class="logo-icon">🎙️</span>
@@ -22,20 +293,15 @@
     </div>
   </header>
 
-  <!-- Kontainer Utama Bento Grid -->
   <main class="container">
-    <!-- PANEL KIRI: Input & Pemutar Media -->
     <section class="panel panel-left">
       <div class="card">
         <h2>1. Sumber Video / Audio</h2>
-        
-        <!-- Tab Pilihan Input -->
         <div class="tabs">
           <button class="tab-btn active" data-tab="tab-file">📁 Upload File (MP4/MP3)</button>
           <button class="tab-btn" data-tab="tab-youtube">▶️ Pratinjau YouTube</button>
         </div>
 
-        <!-- Tab 1: Upload File -->
         <div id="tab-file" class="tab-content active">
           <div id="drop-zone" class="drop-zone">
             <p><strong>Seret & lepas file video/audio di sini</strong></p>
@@ -45,7 +311,6 @@
           <p id="selected-file-name" class="file-info hidden"></p>
         </div>
 
-        <!-- Tab 2: Embed YouTube -->
         <div id="tab-youtube" class="tab-content">
           <div class="input-group">
             <input type="text" id="youtube-url-input" placeholder="Tempel link YouTube di sini..." />
@@ -56,17 +321,14 @@
           </p>
         </div>
 
-        <!-- Pemutar Media Terpadu -->
         <div id="player-wrapper" class="player-wrapper hidden">
           <video id="local-media-player" controls class="media-element hidden"></video>
           <div id="yt-player-container" class="yt-frame hidden"></div>
         </div>
       </div>
 
-      <!-- Kontrol AI -->
       <div class="card">
         <h2>2. Pengaturan Bahasa & AI</h2>
-        
         <div class="form-grid">
           <div class="form-group">
             <label for="source-lang">Bahasa Asli Video</label>
@@ -93,13 +355,10 @@
           </div>
         </div>
 
-        <div class="action-buttons">
-          <button id="btn-transcribe" class="btn btn-primary full-width" disabled>
-            ✨ Mulai Transkripsi & Terjemahkan
-          </button>
-        </div>
+        <button id="btn-transcribe" class="btn btn-primary full-width" disabled>
+          ✨ Mulai Transkripsi & Terjemahkan
+        </button>
 
-        <!-- Indikator Status Proses -->
         <div id="status-box" class="status-box hidden">
           <div class="spinner"></div>
           <span id="status-text">Memproses audio...</span>
@@ -107,7 +366,6 @@
       </div>
     </section>
 
-    <!-- PANEL KANAN: Hasil Transkrip & Catatan Belajar -->
     <section class="panel panel-right">
       <div class="card transcript-card">
         <div class="transcript-header">
@@ -118,7 +376,6 @@
           </div>
         </div>
 
-        <!-- Mode Tampilan -->
         <div class="view-modes">
           <button class="mode-btn active" data-mode="bilingual">Berdampingan (Bilinggual)</button>
           <button class="mode-btn" data-mode="translated">Terjemahan Saja</button>
@@ -126,7 +383,6 @@
           <button class="mode-btn" data-mode="summary">💡 Ringkasan Materi</button>
         </div>
 
-        <!-- Area Konten Utama -->
         <div id="transcript-container" class="transcript-list">
           <div class="empty-state">
             <p>Belum ada transkrip.</p>
@@ -134,13 +390,11 @@
           </div>
         </div>
 
-        <!-- Area Ringkasan AI (Tersembunyi secara default) -->
         <div id="summary-container" class="summary-box hidden"></div>
       </div>
     </section>
   </main>
 
-  <!-- Modal Pengaturan API Key -->
   <div id="settings-modal" class="modal hidden">
     <div class="modal-content">
       <div class="modal-header">
@@ -150,19 +404,16 @@
       <p class="hint">
         Kunci API disimpan <strong>100% lokal di browser Anda</strong> (localStorage) dan tidak pernah dikirim ke server lain.
       </p>
-      
-      <div class="form-group">
+      <div class="form-group" style="margin-top: 10px;">
         <label for="input-groq-key">Groq API Key (Untuk Transkripsi Whisper)</label>
         <input type="password" id="input-groq-key" placeholder="gsk_..." />
         <small>Dapatkan gratis di <a href="https://console.groq.com/keys" target="_blank">console.groq.com</a></small>
       </div>
-
       <div class="form-group">
         <label for="input-gemini-key">Google Gemini API Key (Untuk Terjemahan & Ringkasan)</label>
         <input type="password" id="input-gemini-key" placeholder="AIzaSy..." />
         <small>Dapatkan gratis di <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></small>
       </div>
-
       <div class="modal-footer">
         <button id="btn-clear-keys" class="btn btn-danger">Hapus Kunci</button>
         <button id="btn-save-keys" class="btn btn-primary">Simpan Pengaturan</button>
@@ -170,7 +421,319 @@
     </div>
   </div>
 
-  <!-- Memuat Modul JavaScript (ES6 Modules) -->
-  <script type="module" src="js/app.js"></script>
+  <script>
+    // === MODUL STORAGE ===
+    const STORAGE_KEYS = { GROQ: 'linguastream_groq_key', GEMINI: 'linguastream_gemini_key' };
+    function saveApiKeys(groqKey, geminiKey) {
+      if (groqKey) localStorage.setItem(STORAGE_KEYS.GROQ, groqKey.trim());
+      if (geminiKey) localStorage.setItem(STORAGE_KEYS.GEMINI, geminiKey.trim());
+    }
+    function getApiKeys() {
+      return {
+        groq: localStorage.getItem(STORAGE_KEYS.GROQ) || '',
+        gemini: localStorage.getItem(STORAGE_KEYS.GEMINI) || ''
+      };
+    }
+    function clearApiKeys() {
+      localStorage.removeItem(STORAGE_KEYS.GROQ);
+      localStorage.removeItem(STORAGE_KEYS.GEMINI);
+    }
+    function hasValidKeys() {
+      const { groq, gemini } = getApiKeys();
+      return groq.length > 10 && gemini.length > 10;
+    }
+
+    // === MODUL API ===
+    async function transcribeMedia(file, sourceLang = 'auto') {
+      const { groq } = getApiKeys();
+      if (!groq) throw new Error('Groq API Key belum diisi di Pengaturan.');
+      if (file.size > 25 * 1024 * 1024) {
+        throw new Error('Ukuran file melebihi 25 MB. Kompres audio menjadi MP3 terlebih dahulu.');
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('model', 'whisper-large-v3-turbo');
+      formData.append('response_format', 'verbose_json');
+      if (sourceLang !== 'auto') formData.append('language', sourceLang);
+
+      const response = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${groq}` },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `Gagal transkripsi (HTTP ${response.status})`);
+      }
+
+      const data = await response.json();
+      const segments = (data.segments || []).map((seg, index) => ({
+        id: index,
+        start: seg.start,
+        end: seg.end,
+        originalText: seg.text.trim(),
+        translatedText: ''
+      }));
+
+      return { detectedLanguage: data.language || sourceLang, segments };
+    }
+
+    async function translateAndSummarize(segments, targetLanguage) {
+      const { gemini } = getApiKeys();
+      if (!gemini) throw new Error('Gemini API Key belum diisi di Pengaturan.');
+
+      const payloadLines = segments.map(s => `[${s.id}] ${s.originalText}`).join('\n');
+      const prompt = `Anda adalah asisten penerjemah akademik profesional untuk pelajar.
+1. Terjemahkan setiap baris transkrip berikut ke dalam bahasa ${targetLanguage} secara natural dan akurat. Pertahankan nomor indeks [id].
+2. Buat ringkasan poin-poin pembelajaran utama dan daftar kosakata penting dalam bahasa ${targetLanguage}.
+
+Kembalikan respons HANYA dalam format JSON valid berikut:
+{
+  "translations": [{ "id": 0, "text": "hasil terjemahan baris 0" }],
+  "summary": "Teks ringkasan poin belajar..."
+}
+
+Transkrip Asli:
+${payloadLines}`;
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${gemini}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: 'application/json', temperature: 0.2 }
+        })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `Gagal menerjemahkan (HTTP ${response.status})`);
+      }
+
+      const result = await response.json();
+      const rawJsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!rawJsonText) throw new Error('Respons AI kosong.');
+
+      const parsed = JSON.parse(rawJsonText);
+      const translationMap = new Map((parsed.translations || []).map(item => [item.id, item.text]));
+
+      return {
+        segments: segments.map(seg => ({
+          ...seg,
+          translatedText: translationMap.get(seg.id) || '(Terjemahan tidak tersedia)'
+        })),
+        summary: parsed.summary || 'Ringkasan tidak tersedia.'
+      };
+    }
+
+    // === MODUL UTAMA UI ===
+    let selectedFile = null;
+    let currentSegments = [];
+    let currentSummary = '';
+
+    const dom = {
+      apiBadge: document.getElementById('api-status-badge'),
+      modal: document.getElementById('settings-modal'),
+      btnOpenSettings: document.getElementById('btn-open-settings'),
+      btnCloseSettings: document.getElementById('btn-close-settings'),
+      btnSaveKeys: document.getElementById('btn-save-keys'),
+      btnClearKeys: document.getElementById('btn-clear-keys'),
+      inputGroq: document.getElementById('input-groq-key'),
+      inputGemini: document.getElementById('input-gemini-key'),
+      tabBtns: document.querySelectorAll('.tab-btn'),
+      tabContents: document.querySelectorAll('.tab-content'),
+      dropZone: document.getElementById('drop-zone'),
+      fileInput: document.getElementById('media-file-input'),
+      fileNameDisplay: document.getElementById('selected-file-name'),
+      ytUrlInput: document.getElementById('youtube-url-input'),
+      btnLoadYt: document.getElementById('btn-load-yt'),
+      playerWrapper: document.getElementById('player-wrapper'),
+      localPlayer: document.getElementById('local-media-player'),
+      ytContainer: document.getElementById('yt-player-container'),
+      sourceLang: document.getElementById('source-lang'),
+      targetLang: document.getElementById('target-lang'),
+      btnTranscribe: document.getElementById('btn-transcribe'),
+      statusBox: document.getElementById('status-box'),
+      statusText: document.getElementById('status-text'),
+      searchInput: document.getElementById('search-transcript'),
+      btnExportMd: document.getElementById('btn-export-md'),
+      modeBtns: document.querySelectorAll('.mode-btn'),
+      transcriptContainer: document.getElementById('transcript-container'),
+      summaryContainer: document.getElementById('summary-container')
+    };
+
+    function updateApiStatusUI() {
+      const keys = getApiKeys();
+      dom.inputGroq.value = keys.groq;
+      dom.inputGemini.value = keys.gemini;
+      if (hasValidKeys()) {
+        dom.apiBadge.textContent = 'API Siap ✓';
+        dom.apiBadge.className = 'badge badge-success';
+      } else {
+        dom.apiBadge.textContent = 'API Belum Diatur';
+        dom.apiBadge.className = 'badge badge-warning';
+      }
+    }
+
+    dom.btnOpenSettings.addEventListener('click', () => dom.modal.classList.remove('hidden'));
+    dom.btnCloseSettings.addEventListener('click', () => dom.modal.classList.add('hidden'));
+    dom.btnSaveKeys.addEventListener('click', () => {
+      saveApiKeys(dom.inputGroq.value, dom.inputGemini.value);
+      updateApiStatusUI();
+      dom.modal.classList.add('hidden');
+    });
+    dom.btnClearKeys.addEventListener('click', () => {
+      clearApiKeys();
+      updateApiStatusUI();
+    });
+
+    dom.tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        dom.tabBtns.forEach(b => b.classList.remove('active'));
+        dom.tabContents.forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    dom.dropZone.addEventListener('click', () => dom.fileInput.click());
+    dom.dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dom.dropZone.classList.add('dragover'); });
+    dom.dropZone.addEventListener('dragleave', () => dom.dropZone.classList.remove('dragover'));
+    dom.dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dom.dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleFileSelection(e.dataTransfer.files[0]);
+    });
+    dom.fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) handleFileSelection(e.target.files[0]);
+    });
+
+    function handleFileSelection(file) {
+      selectedFile = file;
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      dom.fileNameDisplay.textContent = `File terpilih: ${file.name} (${sizeMB} MB)`;
+      dom.fileNameDisplay.classList.remove('hidden');
+
+      const objectURL = URL.createObjectURL(file);
+      dom.playerWrapper.classList.remove('hidden');
+      dom.ytContainer.classList.add('hidden');
+      dom.localPlayer.src = objectURL;
+      dom.localPlayer.classList.remove('hidden');
+      dom.btnTranscribe.disabled = false;
+    }
+
+    dom.btnLoadYt.addEventListener('click', () => {
+      const url = dom.ytUrlInput.value.trim();
+      const match = url.match(/(?:v=|youtu\.be\/|shorts\/)([a-zA-Z0-9_-]{11})/);
+      if (!match) return alert('Link YouTube tidak valid.');
+      dom.playerWrapper.classList.remove('hidden');
+      dom.localPlayer.classList.add('hidden');
+      dom.ytContainer.classList.remove('hidden');
+      dom.ytContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${match[1]}" allowfullscreen></iframe>`;
+    });
+
+    dom.btnTranscribe.addEventListener('click', async () => {
+      if (!hasValidKeys()) {
+        dom.modal.classList.remove('hidden');
+        return alert('Silakan masukkan Groq API Key dan Gemini API Key terlebih dahulu.');
+      }
+      if (!selectedFile) return;
+
+      try {
+        setLoading(true, 'Tahap 1/2: Mengenali suara & membuat transkrip...');
+        const transcription = await transcribeMedia(selectedFile, dom.sourceLang.value);
+        setLoading(true, `Tahap 2/2: Menerjemahkan ke ${dom.targetLang.value} & menyusun catatan...`);
+        const result = await translateAndSummarize(transcription.segments, dom.targetLang.value);
+
+        currentSegments = result.segments;
+        currentSummary = result.summary;
+        renderTranscript();
+        dom.summaryContainer.textContent = currentSummary;
+        dom.btnExportMd.disabled = false;
+      } catch (error) {
+        alert(`Terjadi kesalahan: ${error.message}`);
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    function setLoading(isLoading, message = '') {
+      dom.btnTranscribe.disabled = isLoading;
+      dom.statusText.textContent = message;
+      dom.statusBox.classList.toggle('hidden', !isLoading);
+    }
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
+      return `${mins}:${secs}`;
+    }
+
+    function renderTranscript(filterQuery = '') {
+      if (!currentSegments.length) return;
+      const query = filterQuery.toLowerCase();
+      const filtered = currentSegments.filter(seg =>
+        seg.originalText.toLowerCase().includes(query) ||
+        seg.translatedText.toLowerCase().includes(query)
+      );
+
+      dom.transcriptContainer.innerHTML = filtered.map(seg => `
+        <div class="segment-item" data-start="${seg.start}">
+          <span class="timestamp">⏱ ${formatTime(seg.start)} - ${formatTime(seg.end)}</span>
+          <p class="text-original">${seg.originalText}</p>
+          <p class="text-translated">${seg.translatedText}</p>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.segment-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const startTime = parseFloat(item.dataset.start);
+          if (!dom.localPlayer.classList.contains('hidden')) {
+            dom.localPlayer.currentTime = startTime;
+            dom.localPlayer.play();
+          }
+        });
+      });
+    }
+
+    dom.modeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        dom.modeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const mode = btn.dataset.mode;
+        if (mode === 'summary') {
+          dom.transcriptContainer.classList.add('hidden');
+          dom.summaryContainer.classList.remove('hidden');
+        } else {
+          dom.summaryContainer.classList.add('hidden');
+          dom.transcriptContainer.classList.remove('hidden');
+          dom.transcriptContainer.className = `transcript-list mode-${mode}`;
+        }
+      });
+    });
+
+    dom.searchInput.addEventListener('input', (e) => renderTranscript(e.target.value));
+
+    dom.btnExportMd.addEventListener('click', () => {
+      const title = selectedFile ? selectedFile.name : 'Catatan Video';
+      let mdContent = `# Catatan Belajar: ${title}\n\n## Ringkasan Materi\n${currentSummary}\n\n---\n\n## Transkrip Bilinggual\n\n`;
+      currentSegments.forEach(seg => {
+        mdContent += `**[${formatTime(seg.start)}]**\n- *Asli:* ${seg.originalText}\n- **Terjemahan:** ${seg.translatedText}\n\n`;
+      });
+
+      const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Catatan_${title.replace(/\.[^/.]+$/, '')}.md`;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+
+    updateApiStatusUI();
+  </script>
 </body>
 </html>
