@@ -450,54 +450,7 @@
     }
 
     // Mengambil otomatis model LLM aktif tercepat dari akun Groq agar tidak pernah error ganti nama model
-    let cachedActiveModel = null;
-    async function getActiveGroqModel(groqKey) {
-      if (cachedActiveModel) return cachedActiveModel;
-      const res = await fetch('https://api.groq.com/openai/v1/models', {
-        headers: { 'Authorization': `Bearer ${groqKey}` }
-      });
-      if (!res.ok) return 'llama-3.1-8b-instant';
-      const data = await res.json();
-      const ids = (data.data || []).map(m => m.id);
-      
-      // Urutan prioritas model cepat & akurat yang aktif di Groq
-      const preferred = [
-        'llama-3.3-70b-versatile',
-        'meta-llama/llama-4-scout-17b-16e-instruct',
-        'meta-llama/llama-4-maverick-17b-128e-instruct',
-        'llama-3.1-8b-instant',
-        'qwen-qwq-32b',
-        'gemma2-9b-it'
-      ];
-      cachedActiveModel = preferred.find(p => ids.includes(p)) 
-        || ids.find(id => !id.includes('whisper') && !id.includes('guard') && !id.includes('tts')) 
-        || 'llama-3.1-8b-instant';
-      return cachedActiveModel;
-    }
-
-    async function callGroqLLM(groqKey, systemPrompt, userPrompt) {
-      const modelId = await getActiveGroqModel(groqKey);
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${groqKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: modelId,
-          temperature: 0.2,
-          response_format: { type: 'json_object' },
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }
-          ]
-        })
-      });
-
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error?.message || `Gagal menerjemahkan (HTTP ${response.status})`);
-      }
+  
 
       const data = await response.json();
       return JSON.parse(data.choices[0].message.content);
